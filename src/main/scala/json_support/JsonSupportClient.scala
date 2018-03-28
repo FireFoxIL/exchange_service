@@ -12,8 +12,9 @@ trait ClientProtocol extends DefaultJsonProtocol {
       case Seq(JsBoolean(success), JsString(base), JsObject(rates)) =>
         JsonExchangeResponse(success, base, rates.map {
           case (b, JsNumber(v)) => Rate(b, v.toDouble)
+          case _ => throw DeserializationException("Couldn't deserialize")
         }.toList)
-      case Seq(_, _, _) => throw DeserializationException("Cannot deserialize")
+      case _ => throw DeserializationException("Couldn't deserialize")
     }
   }
 

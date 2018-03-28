@@ -12,8 +12,7 @@ import scala.util.{Failure, Success}
 
 
 object WebServer extends Directives {
-
-
+  
   implicit val system = ActorSystem("server")
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
@@ -27,12 +26,11 @@ object WebServer extends Directives {
       post {
         entity(as[JsonRequest]) { req =>
           val list = for (item <- req.data) yield {
-            ExchangeClient.requestAndParse(item) map { res => {
+            ExchangeClient.requestAndParse(item) map { res =>
               if (!res.success)
                 throw new ServerException("Bad reply from api")
-              val currency = find(res.rates, item.currencyFrom) / find(res.rates, item.currencyTo) * item.valueFrom
-              produceItemResponse(item, currency)
-            }
+              val result = find(res.rates, item.currencyFrom) / find(res.rates, item.currencyTo) * item.valueFrom
+              item.produceItemResponse(result)
             }
           }
           onComplete(Future.sequence(list)) {
@@ -44,7 +42,7 @@ object WebServer extends Directives {
     }
 
   def start(host: String, port: Int): Unit = {
-    Http().bindAndHandle(route, host, port) onComplete  {
+    Http().bindAndHandle(route, host, port) onComplete {
       _ => println(s"Server online at http://$host:$port/")
     }
   }

@@ -10,11 +10,4 @@ object JsonSupportServer extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val itemRespFormat = jsonFormat4(ItemResponse)
   implicit val jsonReqFormat = jsonFormat1(JsonRequest)
   implicit val jsonRespFormat = jsonFormat3(JsonResponse)
-
-  def produceItemResponse(req: ItemRequest, valueTo: Double) = ItemResponse(
-    currencyFrom = req.currencyFrom,
-    currencyTo = req.currencyTo,
-    valueFrom = req.valueFrom,
-    valueTo = valueTo,
-  )
 }

@@ -55,40 +55,56 @@ class AppTest extends AsyncFunSuite {
   test("Request to server") {
     import json_support.JsonSupportServer._
 
-    val json = """
-      |{
-      |  "data": [
-      |    {
-      |      "currencyFrom" : "USD",
-      |      "currencyTo" : "RUB",
-      |      "valueFrom" : 15.65
-      |    },
-      |    {
-      |      "currencyFrom" : "EUR",
-      |      "currencyTo" : "RUB",
-      |      "valueFrom" : 20.0
-      |    },
-      |    {
-      |      "currencyFrom" : "CZK",
-      |      "currencyTo" : "RUB",
-      |      "valueFrom" : 10.0
-      |    },
-      |    {
-      |      "currencyFrom" : "UAH",
-      |      "currencyTo" : "RUB",
-      |      "valueFrom" : 25.0
-      |    }
-      |  ]
-      |}
-    """.stripMargin
+    val json =
+      """
+        |{
+        |  "data": [
+        |    {
+        |      "currencyFrom" : "USD",
+        |      "currencyTo" : "RUB",
+        |      "valueFrom" : 15.65
+        |    },
+        |    {
+        |      "currencyFrom" : "EUR",
+        |      "currencyTo" : "RUB",
+        |      "valueFrom" : 20.0
+        |    },
+        |    {
+        |      "currencyFrom" : "CZK",
+        |      "currencyTo" : "RUB",
+        |      "valueFrom" : 10.0
+        |    },
+        |    {
+        |      "currencyFrom" : "UAH",
+        |      "currencyTo" : "RUB",
+        |      "valueFrom" : 25.0
+        |    }
+        |  ]
+        |}
+      """.stripMargin
 
     ExchangeWebServer.start("localhost", 9000)
 
 
-    TestClient.requestExchangeRates("localhost", 9000, json) flatMap  {
+    TestClient.requestExchangeRates("localhost", 9000, json) flatMap {
       res => Unmarshal(res.entity).to[JsonResponse]
     } map {
       res => assert(res.errorCode == 0)
+    }
+  }
+
+  test("Request to server with bad input") {
+    import json_support.JsonSupportServer._
+
+    val json = ""
+
+    ExchangeWebServer.start("localhost", 9000)
+
+
+    TestClient.requestExchangeRates("localhost", 9000, json) flatMap {
+      res => Unmarshal(res.entity).to[JsonResponse]
+    } map {
+      res => assert(res.errorCode == 4)
     }
   }
 }

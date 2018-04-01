@@ -1,8 +1,11 @@
-import ExchangeWebServer.{complete, logger}
-import akka.http.scaladsl.server.StandardRoute
+import ExchangeWebServer.complete
+import akka.http.scaladsl.server.{Directives, StandardRoute}
 import json_support.models.{ItemResponse, JsonResponse}
 import org.apache.logging.log4j.scala.Logging
 
+/**
+  * Defines responses for different scenarios
+  */
 object Responses extends Logging {
 
   import json_support.JsonSupportServer._

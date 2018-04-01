@@ -1,7 +1,7 @@
 import akka.actor.ActorSystem
 import akka.http.javadsl.server.{MalformedRequestContentRejection, RequestEntityExpectedRejection}
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.{Directives, ExceptionHandler, RejectionHandler, UnsupportedRequestContentTypeRejection}
+import akka.http.scaladsl.server.{Directives, RejectionHandler, UnsupportedRequestContentTypeRejection}
 import akka.stream.ActorMaterializer
 import json_support.models._
 import Responses._
@@ -40,7 +40,7 @@ object ExchangeWebServer extends Directives with Logging {
   /**
     * Rejection Handler
     */
-  implicit def rejectionHandler = RejectionHandler.newBuilder()
+  implicit def rejectionHandler: RejectionHandler = RejectionHandler.newBuilder()
     .handle {
       case _:RequestEntityExpectedRejection => badInput()
       case _:UnsupportedRequestContentTypeRejection => badInput()
@@ -95,6 +95,8 @@ object ExchangeWebServer extends Directives with Logging {
       }
     }
 
+  private var serverState: Option[Future[Http.ServerBinding]] = None
+
   /**
     * Starts server on give host and port
     *
@@ -102,9 +104,14 @@ object ExchangeWebServer extends Directives with Logging {
     * @param  port Port
     */
   def start(host: String, port: Int): Unit = {
-    Http().bindAndHandle(route, host, port) onComplete {
-      _ =>
-        logger.info(s"Server online at http://$host:$port/")
+    if (serverState.isEmpty) {
+      serverState = Some(Http().bindAndHandle(route, host, port))
+      serverState.get onComplete {
+        _ =>
+          logger.info(s"Server online at http://$host:$port/")
+      }
+    } else {
+      logger.info("Server is already running")
     }
   }
 }

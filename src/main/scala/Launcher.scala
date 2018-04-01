@@ -1,5 +1,14 @@
+/**
+  * Main method is defined here
+  * */
 object Launcher {
+
+  /**
+    * Entry point
+    *
+    * @param  args  command line arguments
+    */
   def main(args: Array[String]): Unit = {
-    WebServer.start("localhost", 9000)
+    ExchangeWebServer.start("localhost", 9000)
   }
 }

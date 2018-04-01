@@ -5,8 +5,12 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import json_support.models.{ItemRequest, JsonExchangeResponse, JsonResponse}
 
+/**
+  * Collects tests for WebServer
+  */
 class AppTest extends AsyncFunSuite {
 
+  // Initialization of the actor system
   implicit val system = ActorSystem("server")
   implicit val materializer = ActorMaterializer()
 
@@ -50,13 +54,41 @@ class AppTest extends AsyncFunSuite {
 
   test("Request to server") {
     import json_support.JsonSupportServer._
-    WebServer.start("localhost", 9000)
-    TestClient.requestExchangeRates("localhost", 9000) flatMap  {
+
+    val json = """
+      |{
+      |  "data": [
+      |    {
+      |      "currencyFrom" : "USD",
+      |      "currencyTo" : "RUB",
+      |      "valueFrom" : 15.65
+      |    },
+      |    {
+      |      "currencyFrom" : "EUR",
+      |      "currencyTo" : "RUB",
+      |      "valueFrom" : 20.0
+      |    },
+      |    {
+      |      "currencyFrom" : "CZK",
+      |      "currencyTo" : "RUB",
+      |      "valueFrom" : 10.0
+      |    },
+      |    {
+      |      "currencyFrom" : "UAH",
+      |      "currencyTo" : "RUB",
+      |      "valueFrom" : 25.0
+      |    }
+      |  ]
+      |}
+    """.stripMargin
+
+    ExchangeWebServer.start("localhost", 9000)
+
+
+    TestClient.requestExchangeRates("localhost", 9000, json) flatMap  {
       res => Unmarshal(res.entity).to[JsonResponse]
     } map {
-      res => assert(res.data.nonEmpty)
+      res => assert(res.errorCode == 0)
     }
   }
-
-
 }

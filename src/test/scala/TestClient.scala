@@ -5,31 +5,26 @@ import akka.stream.ActorMaterializer
 
 import scala.concurrent.Future
 
+/**
+  * WebClient to perform test requests to the WebServer
+  *
+  * @author Ivan Lyagaev
+  */
 object TestClient {
 
+  // Initialization of the actor system
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  private val json =
-    """
-      |{
-      |  "data": [
-      |    {
-      |      "currencyFrom" : "RUB",
-      |      "currencyTo" : "USD",
-      |      "valueFrom" : 15.65
-      |    },
-      |    {
-      |      "currencyFrom" : "RUB",
-      |      "currencyTo" : "EUR",
-      |      "valueFrom" : 20.0
-      |    }
-      |  ]
-      |}
-    """.stripMargin
-
-  def requestExchangeRates(host: String, port: Int): Future[HttpResponse] = Http().singleRequest(
+  /**
+    * Sends request to the WebServer
+    *
+    * @param  host  Hostname
+    * @param  port  Port
+    * @param  json  Json String for request body
+    */
+  def requestExchangeRates(host: String, port: Int, json: String): Future[HttpResponse] = Http().singleRequest(
     HttpRequest(method = HttpMethods.POST, uri = Uri.from(
       scheme = "http",
       host = host,

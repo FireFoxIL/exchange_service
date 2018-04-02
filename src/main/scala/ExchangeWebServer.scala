@@ -55,6 +55,7 @@ object ExchangeWebServer extends Directives with Logging {
     */
   def timeRequest(ctx: RequestContext): Try[RouteResult] => Unit = {
     val start = System.currentTimeMillis()
+
     {
       case Success(Complete(resp)) =>
         val d = System.currentTimeMillis() - start

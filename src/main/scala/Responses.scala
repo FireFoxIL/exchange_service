@@ -1,5 +1,5 @@
 import ExchangeWebServer.complete
-import akka.http.scaladsl.server.{Directives, StandardRoute}
+import akka.http.scaladsl.server.StandardRoute
 import json_support.models.{ItemResponse, JsonResponse}
 import org.apache.logging.log4j.scala.Logging
 

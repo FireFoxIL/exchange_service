@@ -57,7 +57,7 @@ object ExchangeWebServer extends Directives with Logging {
     val start = System.currentTimeMillis()
 
     {
-      case Success(Complete(resp)) =>
+      case Success(Complete(_)) =>
         val d = System.currentTimeMillis() - start
         logger.info(s"Request [${ctx.request.headers}] took - $d ms")
       case Success(Rejected(_)) =>
@@ -129,11 +129,13 @@ object ExchangeWebServer extends Directives with Logging {
     if (serverState.isEmpty) {
       serverState = Some(Http().bindAndHandle(route, host, port))
       serverState.get onComplete {
-        _ =>
+        case Success(_) =>
           logger.info(s"Server online at http://$host:$port/")
+        case Failure(e) =>
+          logger.error("Server failed to start", e)
       }
     } else {
-      logger.info("Server is already running")
+      logger.info("Tried to start a server while it is already running")
     }
   }
 }

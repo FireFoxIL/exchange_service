@@ -49,10 +49,10 @@ object ExchangeClient extends Logging {
     ).recover {
       // Extracting Timeout Exception and deleting all other messages
       case ex: RequestTimeoutException =>
-        logger.error(s"Timeout error for request [$req]")
+        logger.error(s"Timeout error for request [$req]", ex)
         throw MyServerException("Timeout")
       case ex =>
-        logger.error(s"${ex.getMessage} for request [$req]")
+        logger.error(s"Request [$req] failed", ex)
         throw MyServerException()
     }
   }

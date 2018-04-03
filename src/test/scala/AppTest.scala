@@ -89,7 +89,7 @@ class AppTest extends AsyncFunSuite {
     TestClient.requestExchangeRates("localhost", 9000, json) flatMap {
       res => Unmarshal(res.entity).to[JsonResponse]
     } map {
-      res => assert(res.errorCode == 0)
+      res => assert(res.errorCode == 0 && res.data.nonEmpty)
     }
   }
 
@@ -104,7 +104,7 @@ class AppTest extends AsyncFunSuite {
     TestClient.requestExchangeRates("localhost", 9000, json) flatMap {
       res => Unmarshal(res.entity).to[JsonResponse]
     } map {
-      res => assert(res.errorCode == 4)
+      res => assert(res.errorCode == 4 && res.data.isEmpty)
     }
   }
 }
